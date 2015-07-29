@@ -1,0 +1,31 @@
+{
+  "coverage": "96%",
+  "expectCount": 25,
+  "actualCount": 24,
+  "files": {
+    "src/Chart.js": {
+      "expectCount": 8,
+      "actualCount": 8
+    },
+    "src/Container.js": {
+      "expectCount": 9,
+      "actualCount": 8
+    },
+    "src/Label.js": {
+      "expectCount": 2,
+      "actualCount": 2
+    },
+    "src/PriceLine.js": {
+      "expectCount": 2,
+      "actualCount": 2
+    },
+    "src/SVGNode.js": {
+      "expectCount": 2,
+      "actualCount": 2
+    },
+    "src/Trandline.js": {
+      "expectCount": 2,
+      "actualCount": 2
+    }
+  }
+}

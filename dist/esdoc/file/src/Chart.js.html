@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <base data-ice="baseUrl" href="../../">
+  <title data-ice="title">src/Chart.js | API Document</title>
+  <link type="text/css" rel="stylesheet" href="css/style.css">
+  <link type="text/css" rel="stylesheet" href="css/prettify-tomorrow.css">
+  <script src="script/prettify/prettify.js"></script>
+  
+  
+</head>
+<body class="layout-container">
+
+<header>
+  <a href="./">Home</a>
+  <a href="identifiers.html">Identifier</a>
+  <a href="source.html">Source</a>
+  
+  <a data-ice="repoURL" href="https://github.com/babel/babel-library-boilerplate.git" class="repo-url-github">Repository</a>
+  <div class="search-box">
+  <span>
+    <img src="./image/search.png">
+    <span class="search-input-edge"></span><input class="search-input"><span class="search-input-edge"></span>
+  </span>
+    <ul class="search-result"></ul>
+  </div>
+</header>
+
+<nav class="navigation" data-ice="nav"><div data-ice="classWrap">
+  <h2>Class</h2>
+  <ul>
+    
+  <li data-ice="classDoc"><span><a href="class/src/Chart.js~Chart.html">Chart</a></span></li>
+<li data-ice="classDoc"><span><a href="class/src/Container.js~Container.html">Container</a></span></li>
+<li data-ice="classDoc"><span><a href="class/src/Label.js~Label.html">Label</a></span></li>
+<li data-ice="classDoc"><span><a href="class/src/PriceLine.js~PriceLine.html">PriceLine</a></span></li>
+<li data-ice="classDoc"><span><a href="class/src/SVGNode.js~SVGNode.html">SVGNode</a></span></li>
+<li data-ice="classDoc"><span><a href="class/src/Trandline.js~Trandline.html">Trandline</a></span></li>
+</ul>
+</div>
+
+
+
+
+
+
+
+
+
+
+</nav>
+
+<div class="content" data-ice="content"><h1 data-ice="title">src/Chart.js</h1>
+<pre class="source-code line-number"><code class="prettyprint linenums" data-ice="content">import Container from &apos;./Container&apos;;
+import Label from &apos;./Label&apos;;
+import Trandline from &apos;./Trandline&apos;;
+import PriceLine from &apos;./PriceLine&apos;;
+
+/**
+ * Main Chart class
+ */
+export default class Chart {
+  /**
+   * @param  {String} [containerId]
+   * @param  {Object} [data] - data for chart creation
+   * @param  {Object} [config] - optional
+   */
+  constructor(containerId, data, config) {
+    if (!config) {
+      config = this.initConfig();
+    }
+    if (!data) {
+      data = this.initData();
+    }
+    let container = new Container(containerId);
+    let tempData = this.prepareData(data);
+    this.createLabels(tempData, config.label, container);
+    this.createPriceLines(config, container);
+    this.createTrandline(data, tempData, config, container);
+  }
+
+  /**
+   * initialize config, if input is empty
+   */
+  initConfig() {
+    return {
+      trandline: {
+        /**
+         * [color for trandline]
+         * @type {String}
+         */
+        color: &apos;#979797&apos;,
+        /**
+         * [stroke-width]
+         * @type {Number}
+         */
+        width: 2
+      },
+      label: {
+        /**
+         * [fontfamily]
+         * @type {String}
+         */
+        fontfamily: &apos;sans-serif&apos;,
+        /**
+         * [fontsize for label]
+         * @type {Number}
+         */
+        fontsize: 15,
+        /**
+         * [color for stroke attr]
+         * @type {String}
+         */
+        color: &apos;#a5a5a5&apos;
+      },
+      priceLine: {
+        /**
+         * @type {String}
+         */
+        color: &apos;#e7e7e7&apos;,
+        /**
+         * @type {Number}
+         */
+        width: 1
+      }
+    };
+  }
+
+    /**
+     * @return {Object}
+     */
+    initData() {
+      return {
+        /**
+         * [id for trandline]
+         * @type {String}
+         */
+        id: &apos;usd&apos;,
+        /**
+         * [points for create trandline]
+         * @type {Array}
+         */
+        points: [227.5, 228, 229, 226.3, 225, 227.2, 223]
+      };
+    }
+
+    /**
+     * @param  {Object} [data]
+     * @return {Object}
+     */
+    prepareData(data) {
+      let array = data.points.slice();
+      array.sort();
+      return {
+        minVal: Math.floor(array[0]),
+        maxVal: Math.ceil(array[array.length - 1])
+      };
+    }
+
+    /**
+     * @param  {Object} [data]
+     * @param  {Object} [config]
+     * @param  {Object} [container]
+     */
+    createLabels(data, config, container) {
+      let labelsData = {
+        min: {
+          x: 0,
+          y: container.height - config.fontsize / 3,
+          text: data.minVal
+        },
+        middle: {
+          x: 0,
+          y: container.height / 2 + config.fontsize / 3,
+          text: data.minVal + ((data.maxVal - data.minVal) / 2)
+        },
+        max: {
+          x: 0,
+          y: config.fontsize / 2 + config.fontsize / 3,
+          text: data.maxVal
+        }
+      };
+      let minText = new Label(labelsData.min, config);
+      let middleText = new Label(labelsData.middle, config);
+      let maxText = new Label(labelsData.max, config);
+      container.append(minText);
+      container.append(middleText);
+      container.append(maxText);
+    }
+
+  /**
+   * @param {Object} [config]
+   * @param {Object} [container]
+   */
+    createPriceLines(config, container) {
+      let data = {
+        min: {
+          x1: 50,
+          y1: container.height - config.label.fontsize / 2,
+          x2: container.width,
+          y2: container.height - config.label.fontsize / 2
+        },
+        middle: {
+          x1: 50,
+          y1: container.height / 2,
+          x2: container.width,
+          y2: container.height / 2
+        },
+        max: {
+          x1: 50,
+          y1: config.label.fontsize / 2,
+          x2: container.width,
+          y2: config.label.fontsize / 2
+        }
+      };
+      let minLine = new PriceLine(data.min, config.priceLine);
+      let middleLine = new PriceLine(data.middle, config.priceLine);
+      let maxLine = new PriceLine(data.max, config.priceLine);
+      container.append(minLine);
+      container.append(middleLine);
+      container.append(maxLine);
+    }
+
+    /**
+     * @param  {Object} [data]
+     * @param  {Object} [tempData]
+     * @param  {Object} [config]
+     * @param  {Object} [container]
+     */
+    createTrandline(data, tempData, config, container) {
+      let xStart = 50;
+      let xStep = (container.width - xStart) / (data.points.length - 1);
+      let yStart = container.height - config.label.fontsize;
+      let yStep = yStart / (tempData.maxVal - tempData.minVal);
+      let points = &apos;&apos;;
+      let trandline;
+      data.points.forEach(function(val) {
+        points += Math.floor(xStart) + &apos;,&apos; + Math.floor((tempData.maxVal - val) * yStep + config.label.fontsize / 2) + &apos; &apos;;
+        xStart += xStep;
+      });
+      let preparedData = {
+        id: data.id,
+        points: points
+      };
+      trandline = new Trandline(preparedData, config.trandline);
+      container.append(trandline);
+    }
+}
+</code></pre>
+</div>
+
+<footer class="footer">
+  Generated by <a href="https://esdoc.org">ESDoc<span data-ice="esdocVersion">(0.1.4)</span></a>
+</footer>
+
+<script src="script/search_index.js"></script>
+<script src="script/search.js"></script>
+<script src="script/pretty-print.js"></script>
+<script src="script/inherited-summary.js"></script>
+<script src="script/test-summary.js"></script>
+<script src="script/inner-link.js"></script>
+<script src="script/patch-for-local.js"></script>
+</body>
+</html>
